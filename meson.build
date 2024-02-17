@@ -1,3 +1,5 @@
 project('Table maker', 'c')
 
-executable('maker', 'src/main.c')
+buildtype = 'plain'
+
+executable('maker', 'src/main.c', 'src/vec.c', 'src/vec.h')

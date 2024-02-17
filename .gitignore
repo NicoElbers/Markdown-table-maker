@@ -1,2 +1,5 @@
 **/compile_commands.json
 builddir
+
+test.md
+.cache
