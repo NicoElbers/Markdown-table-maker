@@ -120,18 +120,15 @@ void get_data(struct Table *table) {
   }
 }
 
-// TODO: Implement this less dumb
 char *print_buffer(char *buffer, size_t count) {
   if (count == 0)
     return NULL;
-
-  char *ptr_buffer[count];
 
   int counter = 0;
   char *buf_ptr = buffer;
   char *return_ptr;
   while (counter < count) {
-    ptr_buffer[counter] = buf_ptr;
+    printf("| %s ", buf_ptr);
 
     while (*buf_ptr != 0) {
       buf_ptr++;
@@ -140,10 +137,6 @@ char *print_buffer(char *buffer, size_t count) {
     return_ptr = buf_ptr;
 
     counter++;
-  }
-
-  for (int i = 0; i < count; i++) {
-    printf("| %s ", ptr_buffer[i]);
   }
   printf("|\n");
 
