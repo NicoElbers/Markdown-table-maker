@@ -35,18 +35,27 @@ Item get_headers() {
 
   char buffer[BUFFER_SIZE] = {0};
 
-  // TODO: Loop this if an invalid value is given
+  // TODO: Dumb implementation. Look for/ ask a better way to do a user input
+  // loop
   enum Alignment al = 0;
-  printf("What alignment do you want? (L)eft, (R)ight, (C)enter\n > ");
-  fgets(buffer, BUFFER_SIZE, stdin);
-  char ch = *buffer;
-  char ch_lower = tolower(ch);
-  if (ch_lower == 'l') {
-    al = Left;
-  } else if (ch_lower == 'r') {
-    al = Right;
-  } else if (ch_lower == 'c') {
-    al = Center;
+  int loop = 1;
+  while (loop) {
+    loop = 0;
+
+    printf("What alignment do you want? (L)eft, (R)ight, (C)enter\n > ");
+    fgets(buffer, BUFFER_SIZE, stdin);
+    char ch = *buffer;
+    char ch_lower = tolower(ch);
+    if (ch_lower == 'l') {
+      al = Left;
+    } else if (ch_lower == 'r') {
+      al = Right;
+    } else if (ch_lower == 'c') {
+      al = Center;
+    } else {
+      printf("Invalid option\n");
+      loop = 1;
+    }
   }
 
   printf("Type q to quit\n");
