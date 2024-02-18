@@ -10,30 +10,32 @@
 char *print_buffer(char *buffer, size_t count);
 char *print_full_char_vec(CharVec cv);
 
-void print_table(Item headers, Item data);
-void print_header(Item headers);
+void print_table(struct Table *table);
+void print_header(struct Table *table);
 
 void print_seperator(int *buffer, size_t count);
 
-Item get_headers();
-Item get_data(Item headers);
+void get_headers(struct Table *table);
+void get_data(struct Table *table);
 
 // TODO: Get the alignment right for the data columns right / Grow header space
 // when data is larger than header
-// TODO: Pass around a table struct instead of Items
 int main(int argc, char *argv[]) {
-  Item headers = get_headers();
-  Item data = get_data(headers);
+  struct Table table;
 
-  print_table(headers, data);
+  get_headers(&table);
+  get_data(&table);
+
+  printf("Here is your final table:\n");
+  print_table(&table);
 
   return 0;
 }
 
-Item get_headers() {
-  printf("Create headers below:\n");
-
+void get_headers(struct Table *table) {
   char buffer[BUFFER_SIZE] = {0};
+
+  printf("Create headers below:\n");
 
   // TODO: Dumb implementation. Look for/ ask a better way to do a user input
   // loop
@@ -58,14 +60,16 @@ Item get_headers() {
     }
   }
 
+  table->headers = create_item(al, 16);
+  Item *headers = &table->headers;
+
   printf("Type q to quit\n");
-  Item headers = create_item(al, 10);
 
   // TODO: Look into the spec again to see how I should handle alignment
   // https://github.github.com/gfm/#tables-extension-
   int quit = 0;
   while (!quit) {
-    printf("Header %zu\n > ", headers.count);
+    printf("Header %zu\n > ", headers->count);
 
     fgets(buffer, BUFFER_SIZE, stdin);
 
@@ -75,24 +79,25 @@ Item get_headers() {
     if (*buffer == 'q' && str_len <= 2) {
       quit = 1;
     } else {
-      headers.count++;
-      charVecPushMany(&headers.items, buffer, str_len);
-      intVecPushBack(&headers.lengths, str_len - 1);
-      print_header(headers);
+      headers->count++;
+      charVecPushMany(&headers->items, buffer, str_len);
+      intVecPushBack(&headers->lengths, str_len - 1);
+      print_header(table);
     }
   }
-  return headers;
 }
 
-Item get_data(Item headers) {
-  Item data = create_item(Left, 10);
+void get_data(struct Table *table) {
+  table->data = create_item(Left, 16);
+  Item *data = &table->data;
+  Item *headers = &table->headers;
 
   char buffer[BUFFER_SIZE] = {0};
 
   size_t row = 1;
   int quit = 0;
   while (!quit) {
-    for (size_t i = 0; i < headers.count; i++) {
+    for (size_t i = 0; i < headers->count; i++) {
       printf("Row %zu, column %zu\n > ", row, i);
 
       fgets(buffer, BUFFER_SIZE, stdin);
@@ -106,15 +111,13 @@ Item get_data(Item headers) {
         quit = 1;
         break;
       } else {
-        data.count++;
-        charVecPushMany(&data.items, buffer, str_len);
-        intVecPushBack(&data.lengths, str_len);
-        print_table(headers, data);
+        data->count++;
+        charVecPushMany(&data->items, buffer, str_len);
+        intVecPushBack(&data->lengths, str_len);
+        print_table(table);
       }
     }
   }
-
-  return data;
 }
 
 // TODO: Implement this less dumb
@@ -166,13 +169,18 @@ void print_seperator(int *buffer, size_t count) {
   printf("\n");
 }
 
-void print_header(Item headers) {
+void print_header(struct Table *table) {
+  Item headers = table->headers;
+
   print_buffer(headers.items.array, headers.count);
   print_seperator(headers.lengths.array, headers.count);
 }
 
-void print_table(Item headers, Item data) {
-  print_header(headers);
+void print_table(struct Table *table) {
+  Item headers = table->headers;
+  Item data = table->data;
+
+  print_header(table);
 
   int full_lines = data.count / headers.count;
   char *data_ptr = data.items.array;
