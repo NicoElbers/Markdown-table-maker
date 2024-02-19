@@ -94,11 +94,11 @@ void get_data(struct Table *table) {
 
   char buffer[BUFFER_SIZE] = {0};
 
-  size_t row = 1;
+  size_t row = 0;
   int quit = 0;
   while (!quit) {
     for (size_t i = 0; i < headers->count; i++) {
-      printf("Row %zu, column %zu\n > ", row, i);
+      printf("Row %zu, column %zu\n > ", row + 1, i + 1);
 
       fgets(buffer, BUFFER_SIZE, stdin);
 
