@@ -7,7 +7,7 @@
 
 #define BUFFER_SIZE 1024
 
-char *print_buffer(char *buffer, size_t count);
+char *print_buffer(char *buffer, size_t count, IntVec lengths);
 char *print_full_char_vec(CharVec cv);
 
 void print_table(struct Table *table);
@@ -18,8 +18,6 @@ void print_seperator(int *buffer, size_t count);
 void get_headers(struct Table *table);
 void get_data(struct Table *table);
 
-// TODO: Get the alignment right for the data columns right / Grow header space
-// when data is larger than header
 int main(int argc, char *argv[]) {
   struct Table table;
   table.lengths = createIntVec(10);
@@ -126,7 +124,7 @@ void get_data(struct Table *table) {
   }
 }
 
-char *print_buffer(char *buffer, size_t count) {
+char *print_buffer(char *buffer, size_t count, IntVec lengths) {
   if (count == 0)
     return NULL;
 
@@ -135,6 +133,15 @@ char *print_buffer(char *buffer, size_t count) {
   char *return_ptr;
   while (counter < count) {
     printf("| %s ", buf_ptr);
+
+    int len = strlen(buf_ptr);
+
+    int full_len = *(lengths.array + counter);
+
+    while (len < full_len) {
+      printf(" ");
+      len++;
+    }
 
     while (*buf_ptr != 0) {
       buf_ptr++;
@@ -189,5 +196,5 @@ void print_table(struct Table *table) {
   }
 
   int remaining_items = data.count % headers.count;
-  print_buffer(data_ptr, remaining_items);
+  print_buffer(data_ptr, remaining_items, table->lengths);
 }
