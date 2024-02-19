@@ -22,6 +22,7 @@ void get_data(struct Table *table);
 // when data is larger than header
 int main(int argc, char *argv[]) {
   struct Table table;
+  table.lengths = createIntVec(10);
 
   get_headers(&table);
   get_data(&table);
@@ -81,7 +82,7 @@ void get_headers(struct Table *table) {
     } else {
       headers->count++;
       charVecPushMany(&headers->items, buffer, str_len);
-      intVecPushBack(&headers->lengths, str_len - 1);
+      intVecPushBack(&table->lengths, str_len - 1);
       print_header(table);
     }
   }
@@ -113,7 +114,12 @@ void get_data(struct Table *table) {
       } else {
         data->count++;
         charVecPushMany(&data->items, buffer, str_len);
-        intVecPushBack(&data->lengths, str_len);
+
+        int *column_len = table->lengths.array + row + i;
+        if (*column_len < str_len - 1) {
+          *column_len = str_len - 1;
+        }
+
         print_table(table);
       }
     }
@@ -165,8 +171,8 @@ void print_seperator(int *buffer, size_t count) {
 void print_header(struct Table *table) {
   Item headers = table->headers;
 
-  print_buffer(headers.items.array, headers.count);
-  print_seperator(headers.lengths.array, headers.count);
+  print_buffer(headers.items.array, headers.count, table->lengths);
+  print_seperator(table->lengths.array, headers.count);
 }
 
 void print_table(struct Table *table) {
@@ -179,7 +185,7 @@ void print_table(struct Table *table) {
   char *data_ptr = data.items.array;
 
   for (int i = 0; i < full_lines; i++) {
-    data_ptr = print_buffer(data_ptr, headers.count);
+    data_ptr = print_buffer(data_ptr, headers.count, table->lengths);
   }
 
   int remaining_items = data.count % headers.count;
