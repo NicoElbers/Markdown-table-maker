@@ -6,8 +6,8 @@
 
 // TODO: Implement void vec
 // TODO: Create getters and deletion
-// TODO: Consider implementing all vecs using void vec (slight overhead but easier
-// more general implementation)
+// TODO: Consider implementing all vecs using void vec (slight overhead but
+// easier more general implementation)
 
 void charVecPushBack(CharVec *charVec, char ch) {
   if (charVec->size >= charVec->capacity) {
@@ -71,7 +71,7 @@ void intVecPushBack(IntVec *intVec, int i) {
   if (intVec->array != NULL) {
     intVec->array[intVec->size++] = i;
   } else {
-    perror("Memory allocation failed");
+    perror("IntVec allocation failed");
     exit(-1);
   }
 }
