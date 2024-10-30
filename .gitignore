@@ -3,3 +3,5 @@ builddir
 
 test.md
 .cache
+.direnv
+a.out
